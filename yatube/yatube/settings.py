@@ -31,8 +31,6 @@ ALLOWED_HOSTS = [
     '[::1]',
     'testserver',
 ]
- 
-
 
 # Application definition
 
