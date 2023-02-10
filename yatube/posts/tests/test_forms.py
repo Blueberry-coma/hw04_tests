@@ -48,7 +48,9 @@ class PostURLTests(TestCase):
         )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
-            Post.objects.filter(text='Тестовый текст', group=self.group.pk, author=self.auth_user).exists()
+            Post.objects.filter(
+                text='Тестовый текст', group=self.group.pk,
+                author=self.auth_user).exists()
         )
 
     def test_edit_post_is_valid(self):
@@ -78,4 +80,3 @@ class PostURLTests(TestCase):
         self.assertEqual(post_edit.text, 'Отредактированный в форме текст')
         self.assertEqual(post_edit.author, PostURLTests.author)
         self.assertEqual(post_edit.group, PostURLTests.group)
-        

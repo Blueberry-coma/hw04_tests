@@ -4,7 +4,6 @@ from django.urls import reverse
 from ..models import Group, Post, User
 
 
-
 class PostURLTests(TestCase):
     @classmethod
     def setUpClass(cls):

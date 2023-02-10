@@ -16,7 +16,7 @@ class Paginator_view_test(TestCase):
         )
         cls.posts = [
             Post(
-                text=f'Тестовый пост',
+                text=f'Тестовый пост {i}',
                 author=cls.author,
                 group=cls.group,
             )
