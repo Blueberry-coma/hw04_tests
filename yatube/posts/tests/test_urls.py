@@ -1,9 +1,8 @@
 from http import HTTPStatus
 from django.test import Client, TestCase
-from django.contrib.auth import get_user_model
+from django.urls import reverse
 from ..models import Group, Post, User
 
-User = get_user_model()
 
 
 class PostURLTests(TestCase):
@@ -69,9 +68,13 @@ class PostURLTests(TestCase):
         """Страница /create/ перенаправит анонимного пользователя
         на страницу логина.
         """
-        response = self.guest_client.get('/create/', follow=True)
+        login_url = reverse('users:login')
+        create_url = reverse('posts:post_create')
+        redirect_url = f'{login_url}?next={create_url}'
+        response = self.guest_client.get(reverse(
+            'posts:post_create'))
         self.assertRedirects(
-            response, '/auth/login/?next=/create/')
+            response, redirect_url)
 
     def test_urls_uses_correct_template(self):
         """Проверяем, что URL-адрес использует соответствующий шаблон."""
@@ -87,13 +90,13 @@ class PostURLTests(TestCase):
                 response = self.authorized_client.get(url)
                 self.assertTemplateUsed(response, template)
 
-    def test_task_detail_url_redirect_anonymous_on_admin_login(self):
+    def test_post_detail_url_redirect_anonymous_on_admin_login(self):
         """Страница /posts/1/edit/ перенаправит анонимного пользователя
         на страницу логина.
         """
-        response = self.client.get(
-            f'/posts/{self.post.pk}/edit/', follow=True
-        )
-        self.assertRedirects(
-            response, (f'/auth/login/?next=/posts/{self.post.pk}/edit/')
-        )
+        login_url = reverse('users:login')
+        edit_url = reverse('posts:post_edit', kwargs={'post_id': self.post.pk})
+        redirect_url = f'{login_url}?next={edit_url}'
+        response = self.guest_client.get(reverse(
+            'posts:post_edit', kwargs={'post_id': self.post.pk}))
+        self.assertRedirects(response, redirect_url)

@@ -1,10 +1,7 @@
 from django.urls import reverse
 from http import HTTPStatus
 from django.test import Client, TestCase
-from django.contrib.auth import get_user_model
 from ..models import Group, Post, User
-
-User = get_user_model()
 
 
 class PostURLTests(TestCase):
@@ -37,6 +34,7 @@ class PostURLTests(TestCase):
         form_data = {
             'text': 'Тестовый текст',
             'group': self.group.pk,
+            'id': self.post.pk,
         }
         response = self.authorized_client.post(reverse(
             'posts:post_create'),
@@ -50,7 +48,7 @@ class PostURLTests(TestCase):
         )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
-            Post.objects.filter(text='Тестовый текст').exists()
+            Post.objects.filter(text='Тестовый текст', group=self.group.pk, author=self.auth_user).exists()
         )
 
     def test_edit_post_is_valid(self):
@@ -78,3 +76,6 @@ class PostURLTests(TestCase):
         post_edit = Post.objects.get(id=self.group.pk)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(post_edit.text, 'Отредактированный в форме текст')
+        self.assertEqual(post_edit.author, PostURLTests.author)
+        self.assertEqual(post_edit.group, PostURLTests.group)
+        

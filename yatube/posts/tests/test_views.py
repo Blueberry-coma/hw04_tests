@@ -1,10 +1,7 @@
 from django.urls import reverse
 from django import forms
 from django.test import Client, TestCase
-from django.contrib.auth import get_user_model
 from ..models import Group, Post, User
-
-User = get_user_model()
 
 
 class Paginator_view_test(TestCase):
@@ -17,12 +14,15 @@ class Paginator_view_test(TestCase):
             slug='test_slug',
             description='Тестовое описание',
         )
-        for i in range(13):
-            Post.objects.create(
-                text='Тестовый пост',
+        cls.posts = [
+            Post(
+                text=f'Тестовый пост',
                 author=cls.author,
-                group=cls.group
+                group=cls.group,
             )
+            for i in range(13)
+        ]
+        Post.objects.bulk_create(cls.posts)
 
     def setUp(self):
         self.unauthorized_client = Client()
@@ -141,7 +141,8 @@ class PostURLTests(TestCase):
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
         url = reverse('posts:group_list', kwargs={
-            'slug': self.group.slug})
+            'slug': self.group.slug}
+        )
         response = self.authorized_client.get(url)
         group_title = response.context.get('group').title
         group_description = response.context.get('group').description
